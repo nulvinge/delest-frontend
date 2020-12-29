@@ -1,0 +1,22 @@
+Pages:
+X Create user/key
+_ Create group
+_ Upload post
+_ Join group
+. Show group
+_ Comment
+_ Like
+_ Transfer private key
+_ Notificaions
+
+
+Server:
+_ Serve frontend
+_ Receive upload
+_ Fetch uploads
+_ Notify client
+
+
+Lowest prio:
+
+* Licence for bip39
