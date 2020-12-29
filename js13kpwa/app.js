@@ -1,26 +1,48 @@
 // Generating content based on the template
 const template = `<article>
-  <img src='data/img/placeholder.png' data-src='data/img/SLUG.jpg' alt='NAME'>
-  <h3>#POS. NAME</h3>
-  <ul>
-  <li><span>Author:</span> <strong>AUTHOR</strong></li>
-  <li><span>Twitter:</span> <a href='https://twitter.com/TWITTER'>@TWITTER</a></li>
-  <li><span>Website:</span> <a href='http://WEBSITE/'>WEBSITE</a></li>
-  <li><span>GitHub:</span> <a href='https://GITHUB'>GITHUB</a></li>
-  <li><span>More:</span> <a href='http://js13kgames.com/entries/SLUG'>js13kgames.com/entries/SLUG</a></li>
-  </ul>
+  <h3>AUTHOR GROUP</h3>
+  <span class="date">DATE</span>
+  TEXT
+  MEDIA
+  CHILDS
 </article>`;
+const mediaTemplate = `<img width='WIDTH' height='HEIGHT' src='data/img/placeholder.png' data-src='' style="background-color:COLOR;" >`
+function makeView(id, entry, isChild) {
+  let childs = "";
+  for (const [childId, child] of Object.entries(entries)) {
+    if(child.parent === id) {
+        childs += makeView(childId, child, true)
+    }
+  }
+  let media = "";
+  if(entry.media) {
+    let me = entries[entry.media[0].id];
+    media = mediaTemplate
+          .replace(/COLOR/, me.color)
+          .replace(/WIDTH/, entry.media[0].width)
+          .replace(/HEIGHT/, entry.media[0].height);
+  }
+  let group = "";
+  if(!isChild)
+    group = "> " + entry.group;
+
+  let entryView = template
+    .replace(/AUTHOR/g, entry.author)
+    .replace(/DATE/g, entry.date)
+    .replace(/TEXT/g, entry.text)
+    .replace(/GROUP/g, group)
+    .replace(/MEDIA/g, media)
+    .replace(/CHILDS/g, childs);
+  return entryView;
+}
+
+
 let content = '';
-for (let i = 0; i < games.length; i++) {
-  let entry = template.replace(/POS/g, (i + 1))
-    .replace(/SLUG/g, games[i].slug)
-    .replace(/NAME/g, games[i].name)
-    .replace(/AUTHOR/g, games[i].author)
-    .replace(/TWITTER/g, games[i].twitter)
-    .replace(/WEBSITE/g, games[i].website)
-    .replace(/GITHUB/g, games[i].github);
-  entry = entry.replace('<a href=\'http:///\'></a>', '-');
-  content += entry;
+for (const [id, entry] of Object.entries(entries)) {
+  if(entry.parent !== null)
+    continue;
+
+  content += makeView(id, entry, false);
 }
 document.getElementById('content').innerHTML = content;
 

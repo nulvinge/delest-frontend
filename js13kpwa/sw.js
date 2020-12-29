@@ -1,11 +1,10 @@
-self.importScripts('data/games.js');
-
 // Files to cache
 const cacheName = 'js13kPWA-v1';
 const appShellFiles = [
   '/',
   '/index.html',
   '/app.js',
+  '/games.js',
   '/style.css',
   '/fonts/graduate.eot',
   '/fonts/graduate.ttf',
@@ -22,11 +21,7 @@ const appShellFiles = [
   '/icons/icon-256.png',
   '/icons/icon-512.png',
 ];
-const gamesImages = [];
-for (let i = 0; i < games.length; i++) {
-  gamesImages.push(`data/img/${games[i].slug}.jpg`);
-}
-const contentToCache = appShellFiles.concat(gamesImages);
+const contentToCache = appShellFiles;
 
 // Installing Service Worker
 self.addEventListener('install', (e) => {
