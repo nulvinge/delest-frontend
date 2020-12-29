@@ -36,24 +36,64 @@ function makeView(id, entry, isChild) {
   return entryView;
 }
 
+let Key = '';
 
-let content = '';
-for (const [id, entry] of Object.entries(entries)) {
-  if(entry.parent !== null)
-    continue;
+//localStorage.removeItem("Key");
 
-  content += makeView(id, entry, false);
+function getContent() {
+  Key = localStorage.getItem("Key");
+  
+  let content = '';
+  if(Key) {
+      for (const [id, entry] of Object.entries(entries)) {
+        if(entry.parent !== null)
+          continue;
+        content += makeView(id, entry, false);
+      }
+  } else {
+      content = `<button id="createNewKey">Create new key</button></p>
+                 <input id="mnemonic"></input></p>
+                 <button id="importKey">Import key from mnemonic</button></p>`;
+  }
+  return content;
 }
-document.getElementById('content').innerHTML = content;
+
+document.getElementById('content').innerHTML = getContent();
 
 // Registering Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 
+const createNewKeyButton = document.getElementById('createNewKey');
+if(createNewKeyButton) {
+    createNewKeyButton.addEventListener('click', async () => {
+        let bip = await import('./bip39.js');
+        Key = await window.crypto.subtle.generateKey(
+            { name: "AES-CTR", length: 256, },
+            true,
+            ["encrypt", "decrypt"]
+        )
+
+        localStorage.setItem("Key", Key)
+
+        let jwk = await window.crypto.subtle.exportKey("jwk", Key)
+        let raw = await window.crypto.subtle.exportKey("raw", Key)
+        let mnemonic = bip.entropyToMnemonic(raw);
+        let content = `Write this down: ` + jwk.k
+                    + `<br/>Or use this mnemonic: ` + mnemonic
+                    + `<br/>Then click refresh above`;
+
+        document.getElementById('content').innerHTML = content;
+    });
+}
+
+document.getElementById('refresh').addEventListener('click', () => {
+    document.getElementById('content').innerHTML = getContent();
+});
+
 // Requesting permission for Notifications after clicking on the button
-const button = document.getElementById('notifications');
-button.addEventListener('click', () => {
+document.getElementById('notifications').addEventListener('click', () => {
   Notification.requestPermission().then((result) => {
     if (result === 'granted') {
       randomNotification();
