@@ -1,22 +1,30 @@
 Pages:
 X Create user/key
 _ Create group
-_ Upload post
+X Upload post
+_ Encryption
+_ Upload in background
 _ Join group
-. Show group
+X Show group
 _ Comment
 _ Like
-_ Transfer private key
+X Transfer private key
 _ Notificaions
 
 
 Server:
 _ Serve frontend
-_ Receive upload
-_ Fetch uploads
+X Receive upload (S3)
+X Fetch uploads (S3)
 _ Notify client
 
 
 Lowest prio:
 
-* Licence for bip39
+_ Licence for dependencies: bip39, parser
+_ S3 access restrictions
+    aws s3api put-bucket-acl --bucket deleth --grant-read uri=http://acs.amazonaws.com/groups/global/AllUsers --grant-write uri=http://acs.amazonaws.com/groups/global/AllUsers
+
+
+Test mnemonic:
+dog magic domain reveal jar absent wing minor mutual faint copy dilemma hover warm intact rather rival alpha alpha ivory drift rocket law trap

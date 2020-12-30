@@ -4,7 +4,7 @@ const appShellFiles = [
   '/',
   '/index.html',
   '/app.js',
-  '/games.js',
+  '/parser.min.js',
   '/style.css',
   '/fonts/graduate.eot',
   '/fonts/graduate.ttf',

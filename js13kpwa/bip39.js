@@ -27,17 +27,17 @@ async function sha256(message) {
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
 
     // convert ArrayBuffer to Array
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return Array.from(new Uint8Array(hashBuffer));
 
     // convert bytes to hex string                  
-    const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
-    return hashHex;
+    //const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
+    //return hashHex;
 }
-function deriveChecksumBits(entropyBuffer) {
+async function deriveChecksumBits(entropyBuffer) {
     const ENT = entropyBuffer.length * 8;
     const CS = ENT / 32;
-    const hash = sha256(entropyBuffer);
-    return bytesToBinary(Array.from(hash)).slice(0, CS);
+    const hash = await sha256(entropyBuffer);
+    return bytesToBinary(hash).slice(0, CS);
 }
 
 //// Convert a hex string to a byte array
@@ -57,7 +57,7 @@ function deriveChecksumBits(entropyBuffer) {
 //    return hex.join("");
 //}
 
-export function mnemonicToEntropy(mnemonic, wordlist) {
+export async function mnemonicToEntropy(mnemonic, wordlist) {
     wordlist = wordlist || DEFAULT_WORDLIST;
     if (!wordlist) {
         throw new Error(WORDLIST_REQUIRED);
@@ -91,15 +91,15 @@ export function mnemonicToEntropy(mnemonic, wordlist) {
     if (entropyBytes.length % 4 !== 0) {
         throw new Error(INVALID_ENTROPY);
     }
-    const entropy = Buffer.from(entropyBytes);
-    const newChecksum = deriveChecksumBits(entropy);
+    const entropy = new Uint8Array(entropyBytes);
+    const newChecksum = await deriveChecksumBits(entropy);
     if (newChecksum !== checksumBits) {
         throw new Error(INVALID_CHECKSUM);
     }
-    return entropy.toString('hex');
+    return entropy;
 }
 
-export function entropyToMnemonic(entropy, wordlist) {
+export async function entropyToMnemonic(entropy, wordlist) {
     wordlist = wordlist || DEFAULT_WORDLIST;
     if (!wordlist) {
         throw new Error(WORDLIST_REQUIRED);
@@ -115,7 +115,7 @@ export function entropyToMnemonic(entropy, wordlist) {
         throw new TypeError(INVALID_ENTROPY);
     }
     const entropyBits = bytesToBinary(Array.from(new Uint8Array(entropy)));
-    const checksumBits = deriveChecksumBits(entropy);
+    const checksumBits = await deriveChecksumBits(Array.from(new Uint8Array(entropy)));
     const bits = entropyBits + checksumBits;
     const chunks = bits.match(/(.{1,11})/g);
     const words = chunks.map((binary) => {
